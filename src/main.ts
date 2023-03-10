@@ -3,7 +3,7 @@ import ready from './lib/load.js';
 import {option, select, ul} from './lib/html.js';
 import {NodeMap, node} from './lib/nodes.js';
 import Clock from './clock.js';
-import {getZones} from './worldtime.js';
+import {getTimezoneData, getZones} from './worldtime.js';
 
 type TimeZone = {
 	[node]: HTMLOptionElement;
@@ -14,7 +14,11 @@ type TimeZone = {
 const defaultTimeZones = ["Africa/Cairo", "America/Los_Angeles", "America/New_York", "Asia/Hong_Kong", "Europe/London"],
       fullList = new NodeMap<string, TimeZone>(select({"multiple": true, "size": 10})),
       selectedList = new NodeMap<string, TimeZone>(select({"multiple": true, "size": 10})),
-      clockContainer = ul();
+      clockContainer = ul(),
+      loadClock = (tz: TimeZone) => getTimezoneData(tz.zone).then(data => {
+		tz.clock = new Clock(tz.zone, data.dst_offset + data.raw_offset);
+		clockContainer.append(tz.clock.node);
+      });
 
 ready
 .then(() => {
@@ -41,10 +45,12 @@ ready
 	fullList.delete("");
 	for (const zone of zones) {
 		if (defaultTimeZones.includes(zone)) {
-			selectedList.set(zone, {
+			const tz: TimeZone = {
 				[node]: option(zone),
 				zone,
-			});
+			      };
+			selectedList.set(zone, tz);
+			loadClock(tz);
 		} else {
 			fullList.set(zone, {
 				[node]: option(zone),
