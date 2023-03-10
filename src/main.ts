@@ -9,17 +9,18 @@ import {getTimezoneData, getZones} from './worldtime.js';
 
 type TimeZone = {
 	[node]: HTMLOptionElement;
-	zone: string;
+	name: string;
 	clock?: Clock;
 }
 
-const defaultTimeZones = new JSONSetting("timezones", ["Africa/Cairo", "America/Los_Angeles", "America/New_York", "Asia/Hong_Kong", "Europe/London"], (v: unknown): v is string[] => v instanceof Array && v.every(s => typeof s === "string")),
+const defaultTimeZones = new JSONSetting("timezones", ["Local", "Africa/Cairo", "America/Los_Angeles", "America/New_York", "Asia/Hong_Kong", "Europe/London"], (v: unknown): v is string[] => v instanceof Array && v.every(s => typeof s === "string")),
+      zoneSorter = (a: {name: string}, b: {name: string}) => defaultTimeZones.value.indexOf(a.name) - defaultTimeZones.value.indexOf(b.name),
       fullList = new NodeMap<string, TimeZone>(select({"multiple": true, "size": 10})),
-      selectedList = new NodeMap<string, TimeZone>(select({"multiple": true, "size": 10})),
-      clockContainer = ul({"id": "clocks"}),
-      loadClock = (tz: TimeZone) => getTimezoneData(tz.zone).then(data => {
-		tz.clock = new Clock(tz.zone, data.dst_offset + data.raw_offset);
-		clockContainer.append(tz.clock.node);
+      selectedList = new NodeMap<string, TimeZone>(select({"multiple": true, "size": 10}), zoneSorter),
+      clockContainer = new NodeMap<string, Clock>(ul({"id": "clocks"}), zoneSorter),
+      loadClock = (tz: TimeZone) => getTimezoneData(tz.name).then(data => {
+		tz.clock = new Clock(tz.name, data.dst_offset + data.raw_offset);
+		clockContainer.set(tz.name, tz.clock);
       });
 
 ready
@@ -28,16 +29,16 @@ ready
 	
 	selectedList.set("Local", {
 		[node]: option("Local"),
-		zone: "Local",
+		name: "Local",
 		clock: local
 	});
-	clockContainer.append(local.node);
+	clockContainer.set("Local", local);
 	fullList.set("", {
 		[node]: option({"disabled": true}, "Loading..."),
-		zone: "",
+		name: "",
 	});
 	clearNode(document.body, [
-		clockContainer,
+		clockContainer[node],
 		fullList[node],
 		selectedList[node]
 	]);
@@ -50,14 +51,14 @@ ready
 		if (defaultTimeZones.value.includes(zone)) {
 			const tz: TimeZone = {
 				[node]: option(zone),
-				zone,
+				name: zone,
 			      };
 			selectedList.set(zone, tz);
 			loadClock(tz);
 		} else {
 			fullList.set(zone, {
 				[node]: option(zone),
-				zone,
+				name: zone,
 			});
 		}
 	}
