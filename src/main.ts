@@ -69,7 +69,21 @@ const defaultTimeZones = new JSONSetting("timezones", ["Local", "Africa/Cairo", 
 		}
 	}
       }}, svg({"viewBox": "0 0 2 2"}, polygon({"points": "2,2 0,2 1,0", "fill": "currentColor"}))),
-      moveZoneDown = button({"disabled": true}, svg({"viewBox": "0 0 2 2"}, polygon({"points": "0,0 2,0 1,2", "fill": "currentColor"})));
+      moveZoneDown = button({"disabled": true, "onclick": () => {
+	for (const [zone, tz] of selectedList) {
+		if (tz[node].selected) {
+			const pos = defaultTimeZones.value.indexOf(tz.name);
+			if (pos < defaultTimeZones.value.length - 1) {
+				defaultTimeZones.value.splice(pos, 1);
+				defaultTimeZones.value.splice(pos + 1, 0, zone);
+				defaultTimeZones.save();
+				selectedList.sort();
+				clockContainer.sort();
+			}
+			return;
+		}
+	}
+      }}, svg({"viewBox": "0 0 2 2"}, polygon({"points": "0,0 2,0 1,2", "fill": "currentColor"})));
 
 ready
 .then(() => {
