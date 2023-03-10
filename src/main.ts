@@ -2,7 +2,7 @@ import {add, render} from './lib/css.js';
 import {amendNode, clearNode} from './lib/dom.js';
 import ready from './lib/load.js';
 import {button, div, option, select, ul} from './lib/html.js';
-import {NodeMap, node} from './lib/nodes.js';
+import {NodeMap, node, stringSort} from './lib/nodes.js';
 import {JSONSetting} from './lib/settings.js';
 import {polygon, svg} from './lib/svg.js';
 import Clock from './clock.js';
@@ -16,7 +16,7 @@ type TimeZone = {
 
 const defaultTimeZones = new JSONSetting("timezones", ["Local", "Africa/Cairo", "America/Los_Angeles", "America/New_York", "Asia/Hong_Kong", "Europe/London"], (v: unknown): v is string[] => v instanceof Array && v.every(s => typeof s === "string")),
       zoneSorter = (a: {name: string}, b: {name: string}) => defaultTimeZones.value.indexOf(a.name) - defaultTimeZones.value.indexOf(b.name),
-      fullList = new NodeMap<string, TimeZone, HTMLSelectElement>(select({"multiple": true, "size": 10})),
+      fullList = new NodeMap<string, TimeZone, HTMLSelectElement>(select({"multiple": true, "size": 10}), (a, b) => a.name === "Local" ? -1 : b.name === "Local" ? 1 : stringSort(a.name, b.name)),
       selectedList = new NodeMap<string, TimeZone, HTMLSelectElement>(select({"size": 10}), zoneSorter),
       clockContainer = new NodeMap<string, Clock>(ul({"id": "clocks"}), zoneSorter),
       loadClock = (tz: TimeZone) => getTimezoneData(tz.name).then(data => {
@@ -34,20 +34,25 @@ const defaultTimeZones = new JSONSetting("timezones", ["Local", "Africa/Cairo", 
 	}
 	defaultTimeZones.save();
       }}, svg({"viewBox": "0 0 2 2"}, polygon({"points": "0,0 2,1 0,2", "fill": "currentColor"}))),
-      deselectZone = button({"disabled": true}, svg({"viewBox": "0 0 2 2"}, polygon({"points": "2,0 0,1 2,2", "fill": "currentColor"}))),
+      deselectZone = button({"disabled": true, "onclick": () => {
+	for (const [zone, tz] of selectedList) {
+		if (tz[node].selected) {
+			selectedList.delete(zone);
+			defaultTimeZones.value.splice(defaultTimeZones.value.indexOf(zone), 1);
+			tz.clock?.remove();
+			delete tz.clock;
+			fullList.set(zone, tz);
+			defaultTimeZones.save();
+			clockContainer.delete(zone);
+			return;
+		}
+	}
+      }}, svg({"viewBox": "0 0 2 2"}, polygon({"points": "2,0 0,1 2,2", "fill": "currentColor"}))),
       moveZoneUp = button({"disabled": true}, svg({"viewBox": "0 0 2 2"}, polygon({"points": "2,2 0,2 1,0", "fill": "currentColor"}))),
       moveZoneDown = button({"disabled": true}, svg({"viewBox": "0 0 2 2"}, polygon({"points": "0,0 2,0 1,2", "fill": "currentColor"})));
 
 ready
 .then(() => {
-	const local = new Clock("Local", 0);
-	
-	selectedList.set("Local", {
-		[node]: option("Local"),
-		name: "Local",
-		clock: local
-	});
-	clockContainer.set("Local", local);
 	fullList.set("", {
 		[node]: option({"disabled": true}, "Loading..."),
 		name: "",
@@ -76,6 +81,17 @@ ready
 	amendNode(deselectZone, {"disabled": false});
 	amendNode(moveZoneUp, {"disabled": false});
 	amendNode(moveZoneDown, {"disabled": false});
+	if (defaultTimeZones.value.includes("Local")) {
+		const local = new Clock("Local", 0);
+		selectedList.set("Local", {
+			[node]: option("Local"),
+			name: "Local",
+			clock: local
+		});
+		clockContainer.set("Local", local);
+	} else {
+		zones.unshift("Local");
+	}
 	for (const zone of zones) {
 		if (defaultTimeZones.value.includes(zone)) {
 			const tz: TimeZone = {
