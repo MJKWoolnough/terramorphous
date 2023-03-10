@@ -19,7 +19,13 @@ const defaultTimeZones = new JSONSetting("timezones", ["Local", "Africa/Cairo", 
       fullList = new NodeMap<string, TimeZone, HTMLSelectElement>(select({"multiple": true, "size": 10}), (a, b) => a.name === "Local" ? -1 : b.name === "Local" ? 1 : stringSort(a.name, b.name)),
       selectedList = new NodeMap<string, TimeZone, HTMLSelectElement>(select({"size": 10}), zoneSorter),
       clockContainer = new NodeMap<string, Clock>(ul({"id": "clocks"}), zoneSorter),
-      loadClock = (tz: TimeZone) => getTimezoneData(tz.name).then(data => {
+      loadClock = (tz: TimeZone) => (tz.name === "Local" ? Promise.resolve({
+	"abbreviation": "Local",
+	"dst": false,
+	"dst_offset": 0,
+	"raw_offset": 0,
+	"unixtime": (Date.now() / 1000) | 0
+      }) : getTimezoneData(tz.name)).then(data => {
 		tz.clock = new Clock(tz.name, data.dst_offset + data.raw_offset);
 		clockContainer.set(tz.name, tz.clock);
       }),
@@ -81,17 +87,7 @@ ready
 	amendNode(deselectZone, {"disabled": false});
 	amendNode(moveZoneUp, {"disabled": false});
 	amendNode(moveZoneDown, {"disabled": false});
-	if (defaultTimeZones.value.includes("Local")) {
-		const local = new Clock("Local", 0);
-		selectedList.set("Local", {
-			[node]: option("Local"),
-			name: "Local",
-			clock: local
-		});
-		clockContainer.set("Local", local);
-	} else {
-		zones.unshift("Local");
-	}
+	zones.push("Local");
 	for (const zone of zones) {
 		if (defaultTimeZones.value.includes(zone)) {
 			const tz: TimeZone = {
