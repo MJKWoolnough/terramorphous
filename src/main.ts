@@ -140,6 +140,7 @@ ready
 		} else {
 			fullList.set(zone, {
 				[node]: option(zone),
+				offset: zone === "Local" ? 0 : undefined,
 				name: zone,
 			});
 		}
