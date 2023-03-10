@@ -10,6 +10,7 @@ import {getTimezoneData, getZones} from './worldtime.js';
 
 type TimeZone = {
 	[node]: HTMLOptionElement;
+	offset?: number;
 	name: string;
 	clock?: Clock;
 }
@@ -19,14 +20,14 @@ const defaultTimeZones = new JSONSetting("timezones", ["Local", "Africa/Cairo", 
       fullList = new NodeMap<string, TimeZone, HTMLSelectElement>(select({"multiple": true, "size": 10}), (a, b) => a.name === "Local" ? -1 : b.name === "Local" ? 1 : stringSort(a.name, b.name)),
       selectedList = new NodeMap<string, TimeZone, HTMLSelectElement>(select({"size": 10}), zoneSorter),
       clockContainer = new NodeMap<string, Clock>(ul({"id": "clocks"}), zoneSorter),
-      loadClock = (tz: TimeZone) => (tz.name === "Local" ? Promise.resolve({
-	"abbreviation": "Local",
+      loadClock = (tz: TimeZone) => (tz.offset !== undefined ? Promise.resolve({
+	"abbreviation": tz.name,
 	"dst": false,
 	"dst_offset": 0,
-	"raw_offset": 0,
+	"raw_offset": tz.offset,
 	"unixtime": (Date.now() / 1000) | 0
       }) : getTimezoneData(tz.name)).then(data => {
-		tz.clock = new Clock(tz.name, data.dst_offset + data.raw_offset);
+		tz.clock = new Clock(tz.name, tz.offset = data.dst_offset + data.raw_offset);
 		clockContainer.set(tz.name, tz.clock);
       }),
       selectZone = button({"title": "Select Time Zone(s)", "disabled": true, "onclick": () => {
@@ -63,7 +64,10 @@ const defaultTimeZones = new JSONSetting("timezones", ["Local", "Africa/Cairo", 
 				defaultTimeZones.value.splice(pos - 1, 0, zone);
 				defaultTimeZones.save();
 				selectedList.sort();
-				clockContainer.sort();
+				clockContainer.clear();
+				for (const [, tz] of selectedList) {
+					loadClock(tz);
+				}
 			}
 			return;
 		}
@@ -78,7 +82,10 @@ const defaultTimeZones = new JSONSetting("timezones", ["Local", "Africa/Cairo", 
 				defaultTimeZones.value.splice(pos + 1, 0, zone);
 				defaultTimeZones.save();
 				selectedList.sort();
-				clockContainer.sort();
+				clockContainer.clear();
+				for (const [, tz] of selectedList) {
+					loadClock(tz);
+				}
 			}
 			return;
 		}
@@ -125,6 +132,7 @@ ready
 		if (defaultTimeZones.value.includes(zone)) {
 			const tz: TimeZone = {
 				[node]: option(zone),
+				offset: zone === "Local" ? 0 : undefined,
 				name: zone,
 			      };
 			selectedList.set(zone, tz);
