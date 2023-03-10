@@ -1,7 +1,7 @@
 import {add, render} from './lib/css.js';
 import {amendNode, clearNode} from './lib/dom.js';
 import ready from './lib/load.js';
-import {button, div, option, select, ul} from './lib/html.js';
+import {button, div, h1, h2, option, section, select, ul} from './lib/html.js';
 import {NodeMap, node, stringSort} from './lib/nodes.js';
 import {JSONSetting} from './lib/settings.js';
 import {polygon, svg} from './lib/svg.js';
@@ -92,8 +92,12 @@ ready
 		name: "",
 	});
 	clearNode(document.body, [
-		clockContainer[node],
-		div({"id": "selector"}, [
+		h1({"title": "World Clock Viewer"}, "Terramorphous"),
+		section({"id": "selector"}, [
+			h2("Available Time Zone"),
+			div(),
+			h2("Selected Time Zone(s)"),
+			div(),
 			fullList[node],
 			div([
 				selectZone,
@@ -104,7 +108,8 @@ ready
 				moveZoneUp,
 				moveZoneDown
 			])
-		])
+		]),
+		clockContainer[node],
 	]);
 	amendNode(document.head, render());
 })
@@ -135,6 +140,9 @@ ready
 .catch(() => clearNode(document.body, "Failed to get Time Data"));
 
 add({
+	"h1,h2": {
+		"text-align": "center"
+	},
 	"#clocks": {
 		"display": "grid",
 		"list-style": "none",
@@ -142,7 +150,7 @@ add({
 		"gap": "1em",
 		"grid-template-columns": "repeat(auto-fill, minmax(auto, 20em))",
 		" li": {
-			" div, h2": {
+			" div": {
 				"text-align": "center",
 			}
 		}
