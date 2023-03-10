@@ -1,4 +1,5 @@
-import {clearNode} from './lib/dom.js';
+import {add, render} from './lib/css.js';
+import {amendNode, clearNode} from './lib/dom.js';
 import ready from './lib/load.js';
 import {option, select, ul} from './lib/html.js';
 import {NodeMap, node} from './lib/nodes.js';
@@ -15,7 +16,7 @@ type TimeZone = {
 const defaultTimeZones = new JSONSetting("timezones", ["Africa/Cairo", "America/Los_Angeles", "America/New_York", "Asia/Hong_Kong", "Europe/London"], (v: unknown): v is string[] => v instanceof Array && v.every(s => typeof s === "string")),
       fullList = new NodeMap<string, TimeZone>(select({"multiple": true, "size": 10})),
       selectedList = new NodeMap<string, TimeZone>(select({"multiple": true, "size": 10})),
-      clockContainer = ul(),
+      clockContainer = ul({"id": "clocks"}),
       loadClock = (tz: TimeZone) => getTimezoneData(tz.zone).then(data => {
 		tz.clock = new Clock(tz.zone, data.dst_offset + data.raw_offset);
 		clockContainer.append(tz.clock.node);
@@ -40,6 +41,7 @@ ready
 		fullList[node],
 		selectedList[node]
 	]);
+	amendNode(document.head, render());
 })
 .then(getZones)
 .then(zones => {
@@ -59,6 +61,20 @@ ready
 			});
 		}
 	}
-
 })
 .catch(() => clearNode(document.body, "Failed to get Time Data"));
+
+add({
+	"#clocks": {
+		"display": "grid",
+		"list-style": "none",
+		"padding": 0,
+		"gap": "1em",
+		"grid-template-columns": "repeat(auto-fill, minmax(auto, 20em))",
+		" li": {
+			" div, h2": {
+				"text-align": "center",
+			}
+		}
+	}
+});
