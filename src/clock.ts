@@ -1,4 +1,4 @@
-import {div, li} from './lib/html.js';
+import {div, h2, li} from './lib/html.js';
 import {animateTransform, circle, defs, line, svg, use} from './lib/svg.js';
 
 const unix = () => (Date.now() / 1000) | 0,
@@ -14,13 +14,14 @@ setInterval(() => {
 
 export default class Clock {
 	#node: HTMLLIElement;
-	#time: Text;
+	#time: HTMLDivElement;
 	#offset: number;
 	constructor(name: string, offset: number) {
 		this.#offset = offset;
 		const now = unix(),
 		      begin = "-" + (now + offset);
 		this.#node = li([
+			h2(name),
 			svg({"viewBox": "0 0 100 100"}, [
 				defs(line({"id": "marker", "x1": 50, "x2": 50, "y1": 1, "y2": 10, "stroke": "#888"})),
 				Array.from({"length": 12}, (_, n) => use({"href": "#marker", "transform": `rotate(${30 * n} 50 50)`})),
@@ -30,11 +31,7 @@ export default class Clock {
 				line({"x1": 50, "y1": 50, "x2": 50, "y2": 5, "stroke": "#800", "stroke-width": 1, "stroke-linecap": "round"}, animateTransform({"attributeName": "transform", "attributeType": "XML", "type": "rotate", "from": "0 50 50", "to": "360 50 50", "dur": "60s", "repeatCount": "indefinite", begin})),
 				circle({"cx": 50, "cy": 50, "r": 1, "fill": "#d4af37"})
 			]),
-			div([
-				this.#time = new Text(),
-				" ",
-				name
-			])
+			this.#time = div()
 		]);
 		tickers.push(this);
 		this.tick(now);
