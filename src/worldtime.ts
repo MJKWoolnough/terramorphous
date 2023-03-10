@@ -8,7 +8,7 @@ type Timezone = {
 	unixtime: number;
 }
 
-const server = "http://worldtimeapi.org/api/";
+const server = "https://worldtimeapi.org/api/";
 
 export const getZones = () => HTTPRequest<string[]>(`${server}/timezone`, {"response": "json", "checker": (zones: unknown): zones is string[] =>
 	zones instanceof Array &&
