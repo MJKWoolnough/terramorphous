@@ -16,14 +16,24 @@ type TimeZone = {
 
 const defaultTimeZones = new JSONSetting("timezones", ["Local", "Africa/Cairo", "America/Los_Angeles", "America/New_York", "Asia/Hong_Kong", "Europe/London"], (v: unknown): v is string[] => v instanceof Array && v.every(s => typeof s === "string")),
       zoneSorter = (a: {name: string}, b: {name: string}) => defaultTimeZones.value.indexOf(a.name) - defaultTimeZones.value.indexOf(b.name),
-      fullList = new NodeMap<string, TimeZone>(select({"multiple": true, "size": 10})),
-      selectedList = new NodeMap<string, TimeZone>(select({"size": 10}), zoneSorter),
+      fullList = new NodeMap<string, TimeZone, HTMLSelectElement>(select({"multiple": true, "size": 10})),
+      selectedList = new NodeMap<string, TimeZone, HTMLSelectElement>(select({"size": 10}), zoneSorter),
       clockContainer = new NodeMap<string, Clock>(ul({"id": "clocks"}), zoneSorter),
       loadClock = (tz: TimeZone) => getTimezoneData(tz.name).then(data => {
 		tz.clock = new Clock(tz.name, data.dst_offset + data.raw_offset);
 		clockContainer.set(tz.name, tz.clock);
       }),
-      selectZone = button({"disabled": true}, svg({"viewBox": "0 0 2 2"}, polygon({"points": "0,0 2,1 0,2", "fill": "currentColor"}))),
+      selectZone = button({"disabled": true, "onclick": () => {
+	for (const [zone, tz] of fullList) {
+		if (tz[node].selected) {
+			fullList.delete(zone);
+			defaultTimeZones.value.push(zone);
+			selectedList.set(zone, tz);
+			loadClock(tz);
+		}
+	}
+	defaultTimeZones.save();
+      }}, svg({"viewBox": "0 0 2 2"}, polygon({"points": "0,0 2,1 0,2", "fill": "currentColor"}))),
       deselectZone = button({"disabled": true}, svg({"viewBox": "0 0 2 2"}, polygon({"points": "2,0 0,1 2,2", "fill": "currentColor"}))),
       moveZoneUp = button({"disabled": true}, svg({"viewBox": "0 0 2 2"}, polygon({"points": "2,2 0,2 1,0", "fill": "currentColor"}))),
       moveZoneDown = button({"disabled": true}, svg({"viewBox": "0 0 2 2"}, polygon({"points": "0,0 2,0 1,2", "fill": "currentColor"})));
