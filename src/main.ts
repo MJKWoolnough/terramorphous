@@ -2,6 +2,7 @@ import {clearNode} from './lib/dom.js';
 import ready from './lib/load.js';
 import {option, select, ul} from './lib/html.js';
 import {NodeMap, node} from './lib/nodes.js';
+import {JSONSetting} from './lib/settings.js';
 import Clock from './clock.js';
 import {getTimezoneData, getZones} from './worldtime.js';
 
@@ -11,7 +12,7 @@ type TimeZone = {
 	clock?: Clock;
 }
 
-const defaultTimeZones = ["Africa/Cairo", "America/Los_Angeles", "America/New_York", "Asia/Hong_Kong", "Europe/London"],
+const defaultTimeZones = new JSONSetting("timezones", ["Africa/Cairo", "America/Los_Angeles", "America/New_York", "Asia/Hong_Kong", "Europe/London"], (v: unknown): v is string[] => v instanceof Array && v.every(s => typeof s === "string")),
       fullList = new NodeMap<string, TimeZone>(select({"multiple": true, "size": 10})),
       selectedList = new NodeMap<string, TimeZone>(select({"multiple": true, "size": 10})),
       clockContainer = ul(),
@@ -44,7 +45,7 @@ ready
 .then(zones => {
 	fullList.delete("");
 	for (const zone of zones) {
-		if (defaultTimeZones.includes(zone)) {
+		if (defaultTimeZones.value.includes(zone)) {
 			const tz: TimeZone = {
 				[node]: option(zone),
 				zone,
