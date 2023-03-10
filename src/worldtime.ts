@@ -1,6 +1,6 @@
 import {HTTPRequest} from './lib/conn.js';
 
-export type Timezone = {
+type Timezone = {
 	abbreviation: string;
 	dst: boolean;
 	dst_offset: number;
