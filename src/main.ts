@@ -29,7 +29,7 @@ const defaultTimeZones = new JSONSetting("timezones", ["Local", "Africa/Cairo", 
 		tz.clock = new Clock(tz.name, data.dst_offset + data.raw_offset);
 		clockContainer.set(tz.name, tz.clock);
       }),
-      selectZone = button({"disabled": true, "onclick": () => {
+      selectZone = button({"title": "Select Time Zone(s)", "disabled": true, "onclick": () => {
 	for (const [zone, tz] of fullList) {
 		if (tz[node].selected) {
 			fullList.delete(zone);
@@ -40,7 +40,7 @@ const defaultTimeZones = new JSONSetting("timezones", ["Local", "Africa/Cairo", 
 	}
 	defaultTimeZones.save();
       }}, svg({"viewBox": "0 0 2 2"}, polygon({"points": "0,0 2,1 0,2", "fill": "currentColor"}))),
-      deselectZone = button({"disabled": true, "onclick": () => {
+      deselectZone = button({"title": "Deselect Time Zone", "disabled": true, "onclick": () => {
 	for (const [zone, tz] of selectedList) {
 		if (tz[node].selected) {
 			selectedList.delete(zone);
@@ -54,7 +54,7 @@ const defaultTimeZones = new JSONSetting("timezones", ["Local", "Africa/Cairo", 
 		}
 	}
       }}, svg({"viewBox": "0 0 2 2"}, polygon({"points": "2,0 0,1 2,2", "fill": "currentColor"}))),
-      moveZoneUp = button({"disabled": true, "onclick": () => {
+      moveZoneUp = button({"title": "Move Time Zone Up", "disabled": true, "onclick": () => {
 	for (const [zone, tz] of selectedList) {
 		if (tz[node].selected) {
 			const pos = defaultTimeZones.value.indexOf(tz.name);
@@ -69,7 +69,7 @@ const defaultTimeZones = new JSONSetting("timezones", ["Local", "Africa/Cairo", 
 		}
 	}
       }}, svg({"viewBox": "0 0 2 2"}, polygon({"points": "2,2 0,2 1,0", "fill": "currentColor"}))),
-      moveZoneDown = button({"disabled": true, "onclick": () => {
+      moveZoneDown = button({"title": "Move Time Zone Down", "disabled": true, "onclick": () => {
 	for (const [zone, tz] of selectedList) {
 		if (tz[node].selected) {
 			const pos = defaultTimeZones.value.indexOf(tz.name);
