@@ -1,4 +1,4 @@
-import {add, render} from './lib/css.js';
+import {add, at, render} from './lib/css.js';
 import {amendNode, clearNode} from './lib/dom.js';
 import ready from './lib/load.js';
 import {button, div, h1, h2, option, section, select, ul} from './lib/html.js';
@@ -148,6 +148,11 @@ ready
 .catch(() => clearNode(document.body, "Failed to get Time Data"));
 
 add({
+	"html, body": {
+		"color": "#000",
+		"background-color": "#eee",
+		"--bg": "#fff"
+	},
 	"h1,h2": {
 		"text-align": "center"
 	},
@@ -181,4 +186,11 @@ add({
 			}
 		}
 	}
+});
+at("@media (prefers-color-scheme: dark)", {
+	"html, body": {
+		"color": "#fff",
+		"background-color": "#333",
+		"--bg": "#000"
+	},
 });

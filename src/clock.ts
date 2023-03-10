@@ -26,9 +26,9 @@ export default class Clock {
 		this.#node = li([
 			h2(name),
 			svg({"viewBox": "0 0 100 100"}, [
-				defs(line({"id": "marker", "x1": 50, "x2": 50, "y1": 1, "y2": 10, "stroke": "#888"})),
+				defs(line({"id": "marker", "x1": 50, "x2": 50, "y1": 1, "y2": 10, "stroke": "currentColor", "opacity": 0.5})),
+				circle({"cx": 50, "cy": 50, "r": 48, "fill": "none", "stroke": "currentColor", "style": "fill: var(--bg)", "stroke-width": 4}),
 				Array.from({"length": 12}, (_, n) => use({"href": "#marker", "transform": `rotate(${30 * n} 50 50)`})),
-				circle({"cx": 50, "cy": 50, "r": 48, "fill": "none", "stroke": "currentColor", "stroke-width": 4}),
 				line({"x1": 50, "y1": 50, "x2": 50, "y2": 20, "stroke": "currentColor", "stroke-width": 4, "stroke-linecap": "round"}, animateTransform({"attributeName": "transform", "attributeType": "XML", "type": "rotate", "from": "0 50 50", "to": "360 50 50", "dur": "12h", "repeatCount": "indefinite", begin})),
 				line({"x1": 50, "y1": 50, "x2": 50, "y2": 10, "stroke": "currentColor", "stroke-width": 2, "stroke-linecap": "round"}, animateTransform({"attributeName": "transform", "attributeType": "XML", "type": "rotate", "from": "0 50 50", "to": "360 50 50", "dur": "1h", "repeatCount": "indefinite", begin})),
 				line({"x1": 50, "y1": 50, "x2": 50, "y2": 5, "stroke": "#800", "stroke-width": 1, "stroke-linecap": "round"}, animateTransform({"attributeName": "transform", "attributeType": "XML", "type": "rotate", "from": "0 50 50", "to": "360 50 50", "dur": "60s", "repeatCount": "indefinite", begin})),
