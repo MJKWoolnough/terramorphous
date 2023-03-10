@@ -1,4 +1,5 @@
 import {div, h2, li} from './lib/html.js';
+import {node} from './lib/nodes.js';
 import {animateTransform, circle, defs, line, svg, use} from './lib/svg.js';
 
 const unix = () => (Date.now() / 1000) | 0,
@@ -16,8 +17,10 @@ export default class Clock {
 	#node: HTMLLIElement;
 	#time: HTMLDivElement;
 	#offset: number;
+	#name: string;
 	constructor(name: string, offset: number) {
 		this.#offset = offset;
+		this.#name = name;
 		const now = unix(),
 		      begin = "-" + (now + offset);
 		this.#node = li([
@@ -36,8 +39,11 @@ export default class Clock {
 		tickers.push(this);
 		this.tick(now);
 	}
-	get node() {
+	get [node]() {
 		return this.#node;
+	}
+	get name() {
+		return this.#name;
 	}
 	tick(now: number) {
 		const timestamp = now + this.#offset;
@@ -48,6 +54,5 @@ export default class Clock {
 		if (pos >= 0) {
 			tickers.splice(pos, 1);
 		}
-		this.#node.remove();
 	}
 }
