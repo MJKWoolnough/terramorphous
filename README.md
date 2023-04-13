@@ -7,9 +7,7 @@ The [`index.html`](index.html) file contains the compiled SPA, and can be used s
 
 ## Compilation
 
-The `index.html` can be compiled from the source with the following steps:
+The `index.html` can be compiled from the source by running the `compile.sh` Bash script, which relies on the following non-standard commands:
 
-1. Use [TypeScript](https://github.com/microsoft/TypeScript/) to compile the source code to Javascript.
-2. Run the `compile.sh` Bash script, which relies on the following non-standard commands:
-   - [JSPacker](https://github.com/MJKWoolnough/jspacker), which combines all of the javascript code together.
-   - [Terser](https://github.com/terser/terser), which minifies the javascript.
+- [JSPacker](https://github.com/MJKWoolnough/jspacker), which combines all of the javascript code together.
+- [Terser](https://github.com/terser/terser), which minifies the javascript.
