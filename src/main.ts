@@ -96,7 +96,7 @@ ready
 .then(() => {
 	fullList.set("", {
 		[node]: option({"disabled": true}, "Loading..."),
-		name: "",
+		name: ""
 	});
 	clearNode(document.body, [
 		h1({"title": "World Clock Viewer"}, "Terramorphous"),
@@ -108,7 +108,7 @@ ready
 			fullList[node],
 			div([
 				selectZone,
-				deselectZone,
+				deselectZone
 			]),
 			selectedList[node],
 			div([
@@ -116,7 +116,7 @@ ready
 				moveZoneDown
 			])
 		]),
-		clockContainer[node],
+		clockContainer[node]
 	]);
 	amendNode(document.head, render());
 })
@@ -133,7 +133,7 @@ ready
 			const tz: TimeZone = {
 				[node]: option(zone),
 				offset: zone === "Local" ? 0 : undefined,
-				name: zone,
+				name: zone
 			      };
 			selectedList.set(zone, tz);
 			loadClock(tz);
@@ -141,7 +141,7 @@ ready
 			fullList.set(zone, {
 				[node]: option(zone),
 				offset: zone === "Local" ? 0 : undefined,
-				name: zone,
+				name: zone
 			});
 		}
 	}
@@ -165,7 +165,7 @@ add({
 		"grid-template-columns": "repeat(auto-fill, minmax(auto, 20em))",
 		" li": {
 			" div": {
-				"text-align": "center",
+				"text-align": "center"
 			}
 		}
 	},
@@ -182,7 +182,7 @@ add({
 				"margin": "0 auto",
 				">svg": {
 					"width": "2em",
-					"height": "2em",
+					"height": "2em"
 				}
 			}
 		}
@@ -193,5 +193,5 @@ at("@media (prefers-color-scheme: dark)", {
 		"color": "#fff",
 		"background-color": "#333",
 		"--bg": "#000"
-	},
+	}
 });
