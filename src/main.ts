@@ -1,7 +1,7 @@
 import {add, at, render} from './lib/css.js';
 import {amendNode, clearNode} from './lib/dom.js';
-import ready from './lib/load.js';
 import {button, div, h1, h2, option, section, select, ul} from './lib/html.js';
+import ready from './lib/load.js';
 import {NodeMap, node, stringSort} from './lib/nodes.js';
 import {JSONSetting} from './lib/settings.js';
 import {polygon, svg} from './lib/svg.js';
