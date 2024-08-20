@@ -28,6 +28,7 @@ const defaultTimeZones = new JSONSetting("timezones", ["Local", "Africa/Cairo", 
 	"unixtime": (Date.now() / 1000) | 0
       }) : getTimezoneData(tz.name)).then(data => {
 		tz.clock = new Clock(tz.name, tz.offset = data.dst_offset + data.raw_offset);
+
 		clockContainer.set(tz.name, tz.clock);
       }),
       selectZone = button({"title": "Select Time Zone(s)", "disabled": true, "onclick": () => {
@@ -47,10 +48,13 @@ const defaultTimeZones = new JSONSetting("timezones", ["Local", "Africa/Cairo", 
 			selectedList.delete(zone);
 			defaultTimeZones.value.splice(defaultTimeZones.value.indexOf(zone), 1);
 			tz.clock?.remove();
+
 			delete tz.clock;
+
 			fullList.set(zone, tz);
 			defaultTimeZones.save();
 			clockContainer.delete(zone);
+
 			return;
 		}
 	}
@@ -65,6 +69,7 @@ const defaultTimeZones = new JSONSetting("timezones", ["Local", "Africa/Cairo", 
 				defaultTimeZones.save();
 				selectedList.sort();
 				clockContainer.clear();
+
 				for (const [, tz] of selectedList) {
 					loadClock(tz);
 				}
@@ -83,6 +88,7 @@ const defaultTimeZones = new JSONSetting("timezones", ["Local", "Africa/Cairo", 
 				defaultTimeZones.save();
 				selectedList.sort();
 				clockContainer.clear();
+
 				for (const [, tz] of selectedList) {
 					loadClock(tz);
 				}
@@ -98,6 +104,7 @@ ready
 		[node]: option({"disabled": true}, "Loading..."),
 		name: ""
 	});
+
 	clearNode(document.body, [
 		h1({"title": "World Clock Viewer"}, "Terramorphous"),
 		section({"id": "selector"}, [
@@ -118,6 +125,7 @@ ready
 		]),
 		clockContainer[node]
 	]);
+
 	amendNode(document.head, render());
 })
 .then(getZones)
@@ -128,6 +136,7 @@ ready
 	amendNode(moveZoneUp, {"disabled": false});
 	amendNode(moveZoneDown, {"disabled": false});
 	zones.push("Local");
+
 	for (const zone of zones) {
 		if (defaultTimeZones.value.includes(zone)) {
 			const tz: TimeZone = {
@@ -135,6 +144,7 @@ ready
 				offset: zone === "Local" ? 0 : undefined,
 				name: zone
 			      };
+
 			selectedList.set(zone, tz);
 			loadClock(tz);
 		} else {
@@ -188,6 +198,7 @@ add({
 		}
 	}
 });
+
 at("@media (prefers-color-scheme: dark)", {
 	"html, body": {
 		"color": "#fff",

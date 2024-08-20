@@ -8,6 +8,7 @@ const unix = () => (Date.now() / 1000) | 0,
 
 setInterval(() => {
 	const now = unix();
+
 	for (const ticker of tickers) {
 		ticker.tick(now);
 	}
@@ -18,11 +19,14 @@ export default class Clock {
 	#time: HTMLDivElement;
 	#offset: number;
 	#name: string;
+
 	constructor(name: string, offset: number) {
 		this.#offset = offset;
 		this.#name = name;
+
 		const now = unix(),
 		      begin = "-" + (now + offset);
+
 		this.#node = li([
 			h2(name),
 			svg({"viewBox": "0 0 100 100"}, [
@@ -39,18 +43,24 @@ export default class Clock {
 		tickers.push(this);
 		this.tick(now);
 	}
+
 	get [node]() {
 		return this.#node;
 	}
+
 	get name() {
 		return this.#name;
 	}
+
 	tick(now: number) {
 		const timestamp = now + this.#offset;
+
 		this.#time.textContent = `${formatNumber((timestamp % 86400) / 3600)}:${formatNumber((timestamp % 3600) / 60)}:${formatNumber(timestamp % 60)}`;
 	}
+
 	remove() {
 		const pos = tickers.indexOf(this);
+
 		if (pos >= 0) {
 			tickers.splice(pos, 1);
 		}
